@@ -2,12 +2,13 @@ import streamlit as st
 import cv2
 import mediapipe as mp
 from only_hands import handTracker
-from tensorflow import models
-from google.colab import drive
+from only_hands import keypoints_preprocessor
+#from tensorflow import models
 
-model 
+model = models.load_model('models/NN_from_keypoints')
 
 #App layout
+st.set_page_config(layout='wide')
 col1, col2, col3 = st.columns(3)
 
 #Header with 3 columns to center image
@@ -37,9 +38,8 @@ with col4:
         lmList = tracker.positionFinder(frame)
         FRAME_WINDOW.image(frame)
         #print(lmList)
-        if len(lmList)>0:
-            p.write(str(lmList))
-    #st.camera_input('Webcam', label_visibility='hidden')
+        if len(lmList)==21:
+            p.write(keypoints_preprocessor(lmList))
 
 #Right column to show prediction
 with col5:
@@ -55,6 +55,3 @@ with col5:
         st.write(' ')
         st.markdown("<h1 style='text-align: center; color: grey; vertical-align:middle;'>Translated letter:</h1>", unsafe_allow_html=True)
         st.markdown("<h2 style='text-align: center; color: grey; vertical-align:middle;'>B</h2>", unsafe_allow_html=True)
-        
-        
-        

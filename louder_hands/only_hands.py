@@ -1,5 +1,6 @@
 import cv2
 import mediapipe as mp
+import pandas as pd
 
 class handTracker():
     def __init__(self, mode=False, maxHands=2, detectionCon=0.5,modelComplexity=1,trackCon=0.5):
@@ -36,3 +37,13 @@ class handTracker():
                 cv2.circle(image,(cx,cy), 5 , (255,0,255), cv2.FILLED)
 
         return lmlist
+
+def keypoints_preprocessor(keypoints):
+    data = {}
+    i=0
+    for keypoint in keypoints:
+        data[str(i) + '_h'] = [keypoint[1]]
+        data[str(i) + '_w'] = [keypoint[2]]
+        i+=1
+    data_df = pd.DataFrame.from_dict(data)
+    return data_df
