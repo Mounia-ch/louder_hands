@@ -4,7 +4,7 @@ import time
 import os
 
 class handTracker():
-    def __init__(self, letter, mode=False, maxHands=2, detectionCon=0.5,modelComplexity=1,trackCon=0.5, samples=100):
+    def __init__(self, letter, *, mode=False, maxHands=2, detectionCon=0.5,modelComplexity=1,trackCon=0.5, samples=100):
         self.mode = mode
         self.maxHands = maxHands
         self.detectionCon = detectionCon
@@ -37,16 +37,16 @@ class handTracker():
                 cx,cy = int(lm.x*w), int(lm.y*h)
                 lmlist.append([id,cx,cy])
             if draw:
-                cv2.circle(image,(cx,cy), 15 , (255,0,255), cv2.FILLED)
+                cv2.circle(image,(cx,cy), 5 , (255,0,255), cv2.FILLED)
 
         return lmlist
 
 def main():
 
-    letter = 1
-    samples = 100
+    letter = 24
+    samples = 25
     cap = cv2.VideoCapture(0)
-    tracker = handTracker(letter, samples)
+    tracker = handTracker(letter, samples=samples)
 
     path = '/Users/manuel/Pictures/'
     if not os.path.isdir(path+'draw/'):
@@ -64,12 +64,16 @@ def main():
             pass
 
     pictures = os.listdir(path+'draw/'+str(letter)+'/')
-    pictures = [int(picture.replace('.png', '')) for picture in pictures]
+    if '.DS_Store' in pictures:
+        pictures.remove('.DS_Store')
     if not len(pictures)==0:
+        pictures = [int(picture.replace('.png', '')) for picture in pictures]
         i=max(pictures)+1
+        maxi = i+tracker.samples
     else:
         i=0
-    while i<tracker.samples:
+        maxi = tracker.samples
+    while i<=maxi:
         success,image = cap.read()
         image = tracker.handsFinder(image)
         lmList = tracker.positionFinder(image)
@@ -102,7 +106,7 @@ def main():
                 f.write('\t'.join(lmList_char) + '\t' + str(letter) + '\n')
             print(i)
             i+=1
-            time.sleep(1)
+            time.sleep(0.2)
 
         cv2.imshow("Video",image)
         
